@@ -1,1641 +1,1656 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.1",
   "info": {
-    "title": "Tapis v2 Systems API"
+    "title": "Tapis v2 Systems API",
     "version": "${project.version}-r${buildNumber}"
   },
-  "basePath": "/$%7Bfoundation.base.url%7D",
+  "servers": [
+    {
+      "url": "/$%7Bfoundation.base.url%7D"
+    }
+  ],
   "paths": {
     "/systems/v2/": {
       "get": {
+        "summary": "List and/or search for systems available to you.",
+        "description": "All systems you own, public systems, and systems that have been shared with you.",
+        "operationId": "list",
         "parameters": [
           {
-            "description": "The type of system to return",
-            "enum": [
-              "STORAGE",
-              "EXECUTION"
-            ],
-            "in": "query",
             "name": "type",
-            "required": false,
-            "type": "string"
+            "in": "query",
+            "description": "The type of system to return",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STORAGE",
+                "EXECUTION"
+              ]
+            }
           },
           {
-            "description": "Should only default systems be returned",
-            "in": "query",
             "name": "defaultOnly",
-            "required": false,
-            "type": "boolean"
+            "in": "query",
+            "description": "Should only default systems be returned",
+            "schema": {
+              "type": "boolean"
+            }
           },
           {
-            "description": "Should only publicly available systems be returned",
-            "in": "query",
             "name": "publicOnly",
-            "required": false,
-            "type": "boolean"
+            "in": "query",
+            "description": "Should only publicly available systems be returned",
+            "schema": {
+              "type": "boolean"
+            }
           },
           {
-            "description": "Should only private available systems be returned",
-            "in": "query",
             "name": "privateOnly",
-            "required": false,
-            "type": "boolean"
+            "in": "query",
+            "description": "Should only private available systems be returned",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/MultipleSystemResponse"
-            }
-          }
-        },
-        "description": "All systems you own, public systems, and systems that have been shared with you.",
-        "operationId": "list",
-        "summary": "List and/or search for systems available to you."
-      },
-      "post": {
-        "parameters": [
-          {
-            "description": "The description of the system to add or update.",
-            "in": "body",
-            "name": "fileToUpload",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/SystemRequest",
-              "default": {
-                "description": "My example system using gsissh and gridftp to submit jobs used for testing.",
-                "environment": "",
-                "executionType": "HPC",
-                "id": "demo.execute.example.com",
-                "login": {
-                  "host": "gsissh.example.com",
-                  "auth": {
-                    "credential": "",
-                    "password": "demo",
-                    "server": {
-                      "endpoint": "myproxy.teragrid.org",
-                      "id": "myproxy.teragrid.org",
-                      "name": "XSEDE MyProxy Server",
-                      "port": 7512,
-                      "protocol": "MYPROXY",
-                      "site": "ncsa.uiuc.edu"
-                    },
-                    "type": "X509",
-                    "username": "demo"
-                  },
-                  "port": 2222,
-                  "protocol": "GSISSH",
-                  "scratchDir": "/scratch",
-                  "workDir": "/work"
-                },
-                "maxSystemJobs": 100,
-                "maxSystemJobsPerUser": 10,
-                "name": "Demo SGE + GSISSH demo vm",
-                "queues": [
-                  {
-                    "customDirectives": "",
-                    "default": true,
-                    "maxJobs": 100,
-                    "maxMemoryPerNode": "2GB",
-                    "maxNodes": 128,
-                    "maxProcessorsPerNode": 128,
-                    "maxRequestedTime": "24:00:00",
-                    "maxUserJobs": 10,
-                    "name": "debug"
-                  }
-                ],
-                "scheduler": "SGE",
-                "site": "example.com",
-                "startupScript": "./bashrc",
-                "status": "UP",
-                "storage": {
-                  "host": "gridftp.example.com",
-                  "auth": {
-                    "credential": "",
-                    "password": "demo",
-                    "server": {
-                      "endpoint": "myproxy.teragrid.org",
-                      "id": "myproxy.teragrid.org",
-                      "name": "XSEDE MyProxy Server",
-                      "port": 7512,
-                      "protocol": "MYPROXY",
-                      "site": "ncsa.uiuc.edu"
-                    },
-                    "type": "X509",
-                    "username": "demo"
-                  },
-                  "homeDir": "/",
-                  "port": 2811,
-                  "protocol": "GRIDFTP",
-                  "rootDir": "/home/demo"
-                },
-                "type": "EXECUTION"
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultipleSystemResponse"
+                }
               }
             }
           }
-        ],
+        }
+      },
+      "post": {
+        "summary": "Add or update a system.",
+        "operationId": "add",
+        "requestBody": {
+          "description": "The description of the system to add or update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/SingleSystemResponse"
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleSystemResponse"
+                }
+              }
             }
           }
         },
-        "operationId": "add",
-        "summary": "Add or update a system."
+        "x-codegen-request-body-name": "fileToUpload"
       }
     },
     "/systems/v2/{systemId}": {
-      "delete": {
-        "parameters": [
-          {
-            "description": "The unique id of the system",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
-            }
-          }
-        },
-        "description": "Disables the system and all applications registered to it. Once deleted, the system cannot be recovered and the systemId cannot be reused.",
-        "operationId": "delete",
-        "summary": "Delete a system."
-      },
       "get": {
+        "summary": "Get individual system details.",
+        "operationId": "get",
         "parameters": [
           {
-            "description": "The unique id of the system",
-            "in": "path",
             "name": "systemId",
+            "in": "path",
+            "description": "The unique id of the system",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/SingleSystemResponse"
-            }
-          }
-        },
-        "operationId": "get",
-        "summary": "Get individual system details."
-      },
-      "post": {
-        "parameters": [
-          {
-            "description": "The unique id of the system",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The description of the system to update.",
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/SystemRequest",
-              "default": {
-                "description": "My example system using gsissh and gridftp to submit jobs used for testing.",
-                "environment": "",
-                "executionType": "HPC",
-                "id": "demo.execute.example.com",
-                "login": {
-                  "host": "gsissh.example.com",
-                  "auth": {
-                    "credential": "",
-                    "password": "demo",
-                    "server": {
-                      "endpoint": "myproxy.teragrid.org",
-                      "id": "myproxy.teragrid.org",
-                      "name": "XSEDE MyProxy Server",
-                      "port": 7512,
-                      "protocol": "MYPROXY",
-                      "site": "ncsa.uiuc.edu"
-                    },
-                    "type": "X509",
-                    "username": "demo"
-                  },
-                  "port": 2222,
-                  "protocol": "GSISSH",
-                  "scratchDir": "/scratch",
-                  "workDir": "/work"
-                },
-                "maxSystemJobs": 100,
-                "maxSystemJobsPerUser": 10,
-                "name": "Demo SGE + GSISSH demo vm",
-                "queues": [
-                  {
-                    "customDirectives": "",
-                    "default": true,
-                    "maxJobs": 100,
-                    "maxMemoryPerNode": "2GB",
-                    "maxNodes": 128,
-                    "maxProcessorsPerNode": 128,
-                    "maxRequestedTime": "24:00:00",
-                    "maxUserJobs": 10,
-                    "name": "debug"
-                  }
-                ],
-                "scheduler": "SGE",
-                "site": "example.com",
-                "startupScript": "./bashrc",
-                "status": "UP",
-                "storage": {
-                  "host": "gridftp.example.com",
-                  "auth": {
-                    "credential": "",
-                    "password": "demo",
-                    "server": {
-                      "endpoint": "myproxy.teragrid.org",
-                      "id": "myproxy.teragrid.org",
-                      "name": "XSEDE MyProxy Server",
-                      "port": 7512,
-                      "protocol": "MYPROXY",
-                      "site": "ncsa.uiuc.edu"
-                    },
-                    "type": "X509",
-                    "username": "demo"
-                  },
-                  "homeDir": "/",
-                  "port": 2811,
-                  "protocol": "GRIDFTP",
-                  "rootDir": "/home/demo"
-                },
-                "type": "EXECUTION"
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleSystemResponse"
+                }
               }
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/SingleSystemResponse"
-            }
-          }
-        },
-        "operationId": "update",
-        "summary": "Update a system description."
+        }
       },
       "put": {
+        "summary": "Perform a management action on the system.",
+        "description": "PUBLISH moves the system from private to public. Only API administrators can peform this action. DEFAULT makes the given system your default system of that type. When no system is explicitly specified in URI, your default storage system will be used. CLONE creates a private copy of the named system. Authentication information will not be cloned, so you must update the system with your own credentials.",
+        "operationId": "manage",
         "parameters": [
           {
-            "description": "The unique id of the system",
-            "in": "path",
             "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The description of the system to update.",
-            "in": "body",
-            "name": "body",
+            "in": "path",
+            "description": "The unique id of the system",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/SystemOperationRequest"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The description of the system to update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemOperationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "post": {
+        "summary": "Update a system description.",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The unique id of the system",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The description of the system to update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleSystemResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "summary": "Delete a system.",
+        "description": "Disables the system and all applications registered to it. Once deleted, the system cannot be recovered and the systemId cannot be reused.",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The unique id of the system",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
             }
           }
-        },
-        "description": "PUBLISH moves the system from private to public. Only API administrators can peform this action. DEFAULT makes the given system your default system of that type. When no system is explicitly specified in URI, your default storage system will be used. CLONE creates a private copy of the named system. Authentication information will not be cloned, so you must update the system with your own credentials.",
-        "operationId": "manage",
-        "summary": "Perform a management action on the system."
+        }
       }
     },
     "/systems/v2/{systemId}/credentials": {
-      "delete": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
-            }
-          }
-        },
-        "description": "This will delete all credentials except the default system credential. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
-        "operationId": "deleteCredentials",
-        "summary": "Deletes all credentials registered to a system."
-      },
       "get": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/SystemCredentialsResponse"
-            }
-          }
-        },
+        "summary": "Get a list of all internal users and their credentials on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "listCredentials",
-        "summary": "Get a list of all internal users and their credentials on this system."
-      },
-      "post": {
         "parameters": [
           {
-            "description": "The id of the system.",
-            "in": "path",
             "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The description of the internal user credential to add or update.",
-            "in": "body",
-            "name": "body",
+            "in": "path",
+            "description": "The id of the system.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/UserCredential",
-              "default": {
-                "credential": null,
-                "default": true,
-                "internalUsername": null,
-                "password": "<password>",
-                "server": {
-                  "endpoint": "myproxy.teragrid.org",
-                  "port": 7512,
-                  "protocol": "MYPROXY"
-                },
-                "type": "X509",
-                "username": "nryan"
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemCredentialsResponse"
+                }
               }
             }
           }
+        }
+      },
+      "post": {
+        "summary": "Add or update a user's credential on a system. This applies both to data and, if applicable, login credenitals.",
+        "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
+        "operationId": "updateCredentials",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The description of the internal user credential to add or update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCredential"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "summary": "Deletes all credentials registered to a system.",
+        "description": "This will delete all credentials except the default system credential. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
+        "operationId": "deleteCredentials",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
             }
           }
-        },
-        "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
-        "operationId": "updateCredentials",
-        "summary": "Add or update a user's credential on a system. This applies both to data and, if applicable, login credenitals."
+        }
       }
     },
     "/systems/v2/{systemId}/credentials/{internalUsername}": {
-      "delete": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of a internal user on this system.",
-            "in": "path",
-            "name": "internalUsername",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
-            }
-          }
-        },
-        "description": "This will delete all internal user credentials on this system. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
-        "operationId": "deleteCredentialsForInternalUser",
-        "summary": "Deletes all credentials registered to a system."
-      },
       "get": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of a internal user on this system.",
-            "in": "path",
-            "name": "internalUsername",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/SystemCredentialsResponse"
-            }
-          }
-        },
+        "summary": "Get a list of all internal users and their credentials on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "listCredentialsForInternalUser",
-        "summary": "Get a list of all internal users and their credentials on this system."
-      },
-      "post": {
         "parameters": [
           {
-            "description": "The id of the system.",
-            "in": "path",
             "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of a internal user on this system.",
             "in": "path",
-            "name": "internalUsername",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The description of the internal user credential to add or update.",
-            "in": "body",
-            "name": "body",
+            "description": "The id of the system.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/UserCredential",
-              "default": {
-                "credential": null,
-                "default": true,
-                "internalUsername": null,
-                "password": "<password>",
-                "server": {
-                  "endpoint": "myproxy.teragrid.org",
-                  "port": 7512,
-                  "protocol": "MYPROXY"
-                },
-                "type": "X509",
-                "username": "nryan"
+              "type": "string"
+            }
+          },
+          {
+            "name": "internalUsername",
+            "in": "path",
+            "description": "The username of a internal user on this system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemCredentialsResponse"
+                }
               }
             }
           }
+        }
+      },
+      "post": {
+        "summary": "Add or update a user's credentials on a system.",
+        "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. The internalUsername value in the POST JSON must match the URI username value or an error message will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
+        "operationId": "updateCredentialsForInternalUser",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "internalUsername",
+            "in": "path",
+            "description": "The username of a internal user on this system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The description of the internal user credential to add or update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCredential"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "summary": "Deletes all credentials registered to a system.",
+        "description": "This will delete all internal user credentials on this system. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
+        "operationId": "deleteCredentialsForInternalUser",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "internalUsername",
+            "in": "path",
+            "description": "The username of a internal user on this system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
             }
           }
-        },
-        "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. The internalUsername value in the POST JSON must match the URI username value or an error message will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
-        "operationId": "updateCredentialsForInternalUser",
-        "summary": "Add or update a user's credentials on a system."
+        }
       }
     },
     "/systems/v2/{systemId}/credentials/{internalUsername}/{credentialType}": {
-      "delete": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of a internal user on this system.",
-            "in": "path",
-            "name": "internalUsername",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The configuration type to which to apply this credential.",
-            "enum": [
-              "STORAGE",
-              "LOGIN"
-            ],
-            "in": "path",
-            "name": "credentialType",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
-            }
-          }
-        },
-        "description": "This will delete all internal user credentials for the specified type on this system. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
-        "operationId": "deleteCredentialsForInternalUserByType",
-        "summary": "Deletes the internal user credentials for the given credential type on a system."
-      },
       "get": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of a internal user on this system.",
-            "in": "path",
-            "name": "internalUsername",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The configuration type to which to apply this credential.",
-            "enum": [
-              "STORAGE",
-              "LOGIN"
-            ],
-            "in": "path",
-            "name": "credentialType",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/SystemCredentialsResponse"
-            }
-          }
-        },
+        "summary": "Get the internal user credential of the given type on the system.",
         "description": "If the internal user has no personal credential registered, the system default credential of the specified type will be returned. Users must have ADMIN role or greater on a system to view its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "listCredentialsForInternalUserByType",
-        "summary": "Get the internal user credential of the given type on the system."
-      },
-      "post": {
         "parameters": [
           {
-            "description": "The id of the system.",
-            "in": "path",
             "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of a internal user on this system.",
             "in": "path",
-            "name": "internalUsername",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The configuration type to which to apply this credential.",
-            "enum": [
-              "STORAGE",
-              "LOGIN"
-            ],
-            "in": "path",
-            "name": "credentialType",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The description of the internal user credential to add or update.",
-            "in": "body",
-            "name": "body",
+            "description": "The id of the system.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/UserCredential",
-              "default": {
-                "credential": null,
-                "default": true,
-                "internalUsername": null,
-                "password": "<password>",
-                "server": {
-                  "endpoint": "myproxy.teragrid.org",
-                  "port": 7512,
-                  "protocol": "MYPROXY"
-                },
-                "type": "X509",
-                "username": "nryan"
+              "type": "string"
+            }
+          },
+          {
+            "name": "internalUsername",
+            "in": "path",
+            "description": "The username of a internal user on this system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "credentialType",
+            "in": "path",
+            "description": "The configuration type to which to apply this credential.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STORAGE",
+                "LOGIN"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemCredentialsResponse"
+                }
               }
             }
           }
+        }
+      },
+      "post": {
+        "summary": "Add or update a credential of the given type on a system.",
+        "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. The internalUsername value in the POST JSON must match the URI username value or an error message will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
+        "operationId": "updateCredentialsForInternalUserByType",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "internalUsername",
+            "in": "path",
+            "description": "The username of a internal user on this system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "credentialType",
+            "in": "path",
+            "description": "The configuration type to which to apply this credential.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STORAGE",
+                "LOGIN"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The description of the internal user credential to add or update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCredential"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "summary": "Deletes the internal user credentials for the given credential type on a system.",
+        "description": "This will delete all internal user credentials for the specified type on this system. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
+        "operationId": "deleteCredentialsForInternalUserByType",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "internalUsername",
+            "in": "path",
+            "description": "The username of a internal user on this system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "credentialType",
+            "in": "path",
+            "description": "The configuration type to which to apply this credential.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STORAGE",
+                "LOGIN"
+              ]
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
             }
           }
-        },
-        "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. The internalUsername value in the POST JSON must match the URI username value or an error message will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
-        "operationId": "updateCredentialsForInternalUserByType",
-        "summary": "Add or update a credential of the given type on a system."
+        }
       }
     },
     "/systems/v2/{systemId}/roles": {
-      "delete": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
-            }
-          }
-        },
-        "description": "This will reset the permissions such that only the user who registered the system will be able to view it. System owners cannot remove their own permissions. All apps registered by the deleted users on this system will be disabled. Users must have ADMIN role or greater on a system to delete its roles.",
-        "operationId": "deleteRoles",
-        "summary": "Deletes all roles on a system."
-      },
       "get": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/MultipleSystemRoleResponse"
-            }
-          }
-        },
+        "summary": "Get a list of all users and their roles on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its roles.",
         "operationId": "listRoles",
-        "summary": "Get a list of all users and their roles on this system."
-      },
-      "post": {
         "parameters": [
           {
-            "description": "The id of the system.",
-            "in": "path",
             "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The role to update.",
-            "in": "body",
-            "name": "body",
+            "in": "path",
+            "description": "The id of the system.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/SystemRole"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultipleSystemRoleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add or update a user's role on a system.",
+        "description": "Setting a user's role to NONE or an empty string is the same as deleting that user's permission. Once all user's roles have been removed from a system, any applications that were registered by the user on the system will be disabled. Users must have ADMIN role or greater on a system to manage its roles.",
+        "operationId": "updateRole",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
             "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The role to update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemRole"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
             }
           }
         },
-        "description": "Setting a user's role to NONE or an empty string is the same as deleting that user's permission. Once all user's roles have been removed from a system, any applications that were registered by the user on the system will be disabled. Users must have ADMIN role or greater on a system to manage its roles.",
-        "operationId": "updateRole",
-        "summary": "Add or update a user's role on a system."
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "summary": "Deletes all roles on a system.",
+        "description": "This will reset the permissions such that only the user who registered the system will be able to view it. System owners cannot remove their own permissions. All apps registered by the deleted users on this system will be disabled. Users must have ADMIN role or greater on a system to delete its roles.",
+        "operationId": "deleteRoles",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/systems/v2/{systemId}/roles/{username}": {
-      "delete": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of the api user associated with the role",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
-            }
-          }
-        },
-        "description": "This will reset the permissions such that only the user who registered the system will be able to view it. System owners cannot remove their own permissions. All apps registered by the deleted users on this system will be disabled. Users must have ADMIN role or greater on a system to delete its roles.",
-        "operationId": "deleteRoleForUser",
-        "summary": "Deletes all roles on a system."
-      },
       "get": {
-        "parameters": [
-          {
-            "description": "The id of the system.",
-            "in": "path",
-            "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of the user about whose role you are inquiring.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "No response was specified",
-            "schema": {
-              "$ref": "#/definitions/MultipleSystemRoleResponse"
-            }
-          }
-        },
+        "summary": "Get a specific user's roles on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its roles.",
         "operationId": "listRolesForUser",
-        "summary": "Get a specific user's roles on this system."
-      },
-      "post": {
         "parameters": [
           {
-            "description": "The id of the system.",
-            "in": "path",
             "name": "systemId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The username of the api user associated with the role",
             "in": "path",
-            "name": "username",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "The role to update.",
-            "in": "body",
-            "name": "body",
+            "description": "The id of the system.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/SystemRole"
+              "type": "string"
+            }
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The username of the user about whose role you are inquiring.",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultipleSystemRoleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add or update a user's role on a system.",
+        "description": "Setting a user's role to NONE or an empty string is the same as deleting that user's permission. Once all user's roles have been removed from a system, any applications that were registered by the user on the system will be disabled. Users must have ADMIN role or greater on a system to edit its roles.",
+        "operationId": "updateRoleForUser",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
             "schema": {
-              "$ref": "#/definitions/EmptySystemResponse"
+              "type": "string"
+            }
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The username of the api user associated with the role",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The role to update.",
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemRole"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
             }
           }
         },
-        "description": "Setting a user's role to NONE or an empty string is the same as deleting that user's permission. Once all user's roles have been removed from a system, any applications that were registered by the user on the system will be disabled. Users must have ADMIN role or greater on a system to edit its roles.",
-        "operationId": "updateRoleForUser",
-        "summary": "Add or update a user's role on a system."
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "summary": "Deletes all roles on a system.",
+        "description": "This will reset the permissions such that only the user who registered the system will be able to view it. System owners cannot remove their own permissions. All apps registered by the deleted users on this system will be disabled. Users must have ADMIN role or greater on a system to delete its roles.",
+        "operationId": "deleteRoleForUser",
+        "parameters": [
+          {
+            "name": "systemId",
+            "in": "path",
+            "description": "The id of the system.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The username of the api user associated with the role",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "No response was specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmptySystemResponse"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
-  "definitions": {
-    "BatchQueue": {
-      "properties": {
-        "customDirectives": {
-          "description": "Any custom directives that should be appended to scheduler directives. ex. #$ -A TG-12345",
-          "type": "string"
-        },
-        "isDefault": {
-          "description": "Is this the default queue for the system.",
-          "type": "boolean"
-        },
-        "maxJobs": {
-          "description": "The maximum number of jobs that can be in queue at once.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "maxMemoryPerNode": {
-          "description": "The max memory available per node to jobs submitted to this queue.",
-          "type": "string"
-        },
-        "maxNodes": {
-          "description": "The max nodes available per node to jobs submitted to this queue.",
-          "type": "string"
-        },
-        "maxProcessorsPerNode": {
-          "description": "The max processors per node available to jobs submitted to this queue.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "maxRequestedTime": {
-          "description": "The max length of jobs submitted to this queue in hhh:mm:ss format.",
-          "type": "string"
-        },
-        "maxUserJobs": {
-          "description": "The maximum number of jobs per user that can be in queue at once.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "name": {
-          "description": "The name of the batch queue.",
-          "type": "string"
+  "components": {
+    "schemas": {
+      "BatchQueue": {
+        "required": [
+          "isDefault",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "customDirectives": {
+            "type": "string",
+            "description": "Any custom directives that should be appended to scheduler directives. ex. #$ -A TG-12345"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Is this the default queue for the system."
+          },
+          "maxJobs": {
+            "type": "integer",
+            "description": "The maximum number of jobs that can be in queue at once.",
+            "format": "int32"
+          },
+          "maxMemoryPerNode": {
+            "type": "string",
+            "description": "The max memory available per node to jobs submitted to this queue."
+          },
+          "maxNodes": {
+            "type": "string",
+            "description": "The max nodes available per node to jobs submitted to this queue."
+          },
+          "maxProcessorsPerNode": {
+            "type": "integer",
+            "description": "The max processors per node available to jobs submitted to this queue.",
+            "format": "int32"
+          },
+          "maxRequestedTime": {
+            "type": "string",
+            "description": "The max length of jobs submitted to this queue in hhh:mm:ss format."
+          },
+          "maxUserJobs": {
+            "type": "integer",
+            "description": "The maximum number of jobs per user that can be in queue at once.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the batch queue."
+          }
         }
       },
-      "required": [
-        "isDefault",
-        "name"
-      ]
-    },
-    "EmptySystemResponse": {
-      "properties": {
-        "message": {
-          "description": "success or failure",
-          "type": "string"
-        },
-        "result": {
-          "description": "empty result",
-          "type": "string"
-        },
-        "status": {
-          "description": "success or failure",
-          "type": "string"
+      "EmptySystemResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "success or failure"
+          },
+          "result": {
+            "type": "string",
+            "description": "empty result"
+          },
+          "status": {
+            "type": "string",
+            "description": "success or failure"
+          }
         }
-      }
-    },
-    "ExecutionSystem": {
-      "allOf": [
-        {
-          "properties": {
-            "executionType": {
-              "description": "The execution paradigm used to run jobs on this system.",
-              "enum": [
-                "HPC",
-                "CONDOR",
-                "CLI"
-              ],
-              "type": "string"
-            },
-            "login": {
-              "$ref": "#/definitions/LoginConfig",
-              "description": "The login config defining how to connect to this system for job submission."
-            },
-            "maxSystemJobs": {
-              "description": "The maximum number of jobs that can be simultaneously run on the system across all queues.",
-              "format": "int32",
-              "type": "integer"
-            },
-            "maxSystemJobsPerUser": {
-              "description": "The maximum number of jobs that can be simultaneously run on the system across all queues by a single user.",
-              "format": "int32",
-              "type": "integer"
-            },
-            "queues": {
-              "description": "The execution paradigm used to run jobs on this system.",
-              "items": {
-                "$ref": "#/definitions/BatchQueue"
+      },
+      "ExecutionSystem": {
+        "allOf": [
+          {
+            "required": [
+              "executionType",
+              "login",
+              "queues",
+              "scheduler"
+            ],
+            "type": "object",
+            "properties": {
+              "executionType": {
+                "type": "string",
+                "description": "The execution paradigm used to run jobs on this system.",
+                "enum": [
+                  "HPC",
+                  "CONDOR",
+                  "CLI"
+                ]
               },
-              "type": "array"
-            },
-            "scheduler": {
-              "description": "The type of scheduled used to run jobs.",
-              "enum": [
-                "COBALT",
-                "CONDOR",
-                "FORK",
-                "LOADLEVELER",
-                "LSF",
-                "MOAB",
-                "PBS",
-                "SGE",
-                "SLURM",
-                "TORQUE",
-                "UNKNOWN"
-              ],
-              "type": "string"
-            },
-            "scratchDir": {
-              "description": "The scratch directory where job execution directories will be created at runtime. The workDir is used if this is not specified.",
-              "type": "string"
-            },
-            "workDir": {
-              "description": "The work directory where job execution directories will be created at runtime. This is used if scratchDir is not specified. If neither are specified, the job directory will be created in the system homeDir.",
-              "type": "string"
+              "login": {
+                "$ref": "#/components/schemas/LoginConfig"
+              },
+              "maxSystemJobs": {
+                "type": "integer",
+                "description": "The maximum number of jobs that can be simultaneously run on the system across all queues.",
+                "format": "int32"
+              },
+              "maxSystemJobsPerUser": {
+                "type": "integer",
+                "description": "The maximum number of jobs that can be simultaneously run on the system across all queues by a single user.",
+                "format": "int32"
+              },
+              "queues": {
+                "type": "array",
+                "description": "The execution paradigm used to run jobs on this system.",
+                "items": {
+                  "$ref": "#/components/schemas/BatchQueue"
+                }
+              },
+              "scheduler": {
+                "type": "string",
+                "description": "The type of scheduled used to run jobs.",
+                "enum": [
+                  "COBALT",
+                  "CONDOR",
+                  "FORK",
+                  "LOADLEVELER",
+                  "LSF",
+                  "MOAB",
+                  "PBS",
+                  "SGE",
+                  "SLURM",
+                  "TORQUE",
+                  "UNKNOWN"
+                ]
+              },
+              "scratchDir": {
+                "type": "string",
+                "description": "The scratch directory where job execution directories will be created at runtime. The workDir is used if this is not specified."
+              },
+              "workDir": {
+                "type": "string",
+                "description": "The work directory where job execution directories will be created at runtime. This is used if scratchDir is not specified. If neither are specified, the job directory will be created in the system homeDir."
+              }
             }
           },
-          "required": [
-            "executionType",
-            "login",
-            "queues",
-            "scheduler"
-          ]
-        },
-        {
-          "$ref": "#/definitions/System"
-        },
-        {
-          "$ref": "#/definitions/SystemRequest"
-        }
-      ]
-    },
-    "LoginConfig": {
-      "properties": {
-        "host": {
-          "description": "The hostname or ip address of the submission server",
-          "type": "string"
-        },
-        "auth": {
-          "$ref": "#/definitions/UserCredential",
-          "description": "The default authentication credential used for this system."
-        },
-        "port": {
-          "description": "The port number of the submission server.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "protocol": {
-          "description": "The protocol used to authenticate to the submission server.",
-          "enum": [
-            "GSISSH",
-            "SSH",
-            "LOCAL"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "auth",
-        "host",
-        "port",
-        "protocol"
-      ]
-    },
-    "MultipleSystemResponse": {
-      "properties": {
-        "message": {
-          "description": "success or failure",
-          "type": "string"
-        },
-        "result": {
-          "description": "response body",
-          "items": {
-            "$ref": "#/definitions/SystemSummary"
+          {
+            "$ref": "#/components/schemas/System"
           },
-          "type": "array"
-        },
-        "status": {
-          "description": "success or failure",
-          "type": "string"
-        }
-      }
-    },
-    "MultipleSystemRoleResponse": {
-      "properties": {
-        "message": {
-          "description": "success or failure",
-          "type": "string"
-        },
-        "result": {
-          "description": "All matching roles for this system",
-          "items": {
-            "$ref": "#/definitions/SystemRole"
+          {
+            "$ref": "#/components/schemas/SystemRequest"
+          }
+        ]
+      },
+      "LoginConfig": {
+        "required": [
+          "auth",
+          "host",
+          "port",
+          "protocol"
+        ],
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "The hostname or ip address of the submission server"
           },
-          "type": "array"
-        },
-        "status": {
-          "description": "success or failure",
-          "type": "string"
-        }
-      }
-    },
-    "SingleSystemResponse": {
-      "properties": {
-        "message": {
-          "description": "success or failure",
-          "type": "string"
-        },
-        "result": {
-          "$ref": "#/definitions/System"
-        },
-        "status": {
-          "description": "success or failure",
-          "type": "string"
-        }
-      }
-    },
-    "StorageConfig": {
-      "properties": {
-        "host": {
-          "description": "The hostname or ip address of the storage server",
-          "type": "string"
-        },
-        "auth": {
-          "$ref": "#/definitions/UserCredential",
-          "description": "The default authentication credential used for this system."
-        },
-        "containerName": {
-          "description": "The name of the bucket to interact with when using an object store.",
-          "type": "string"
-        },
-        "homeDir": {
-          "description": "The path on the remote system to use as the home directory for all API requests. For cases where the home directory should be dynamically defined, the ${USERNAME} token can be included in the homeDir value to represent the username of the authenticated user. ex. /home/${USERNAME}.",
-          "type": "string"
-        },
-        "mirror": {
-          "description": "Whether the permissions set on the server should be pushed to the storage system itself. This only applies to IRODS and AWS systems.",
-          "type": "boolean"
-        },
-        "port": {
-          "description": "The port number of the storage server.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "protocol": {
-          "description": "The protocol used to authenticate to the storage server.",
-          "enum": [
-            "AZURE",
-            "FTP",
-            "GRIDFTP",
-            "IRODS",
-            "LOCAL",
-            "S3",
-            "SFTP",
-            "SWIFT"
-          ],
-          "type": "string"
-        },
-        "publicAppsDir": {
-          "description": "The path on the remote system where apps will be stored if this is set as the default public storage system.",
-          "type": "string"
-        },
-        "resource": {
-          "description": "The name of the target resource when defining an IRODS system.",
-          "type": "string"
-        },
-        "rootDir": {
-          "description": "The path on the remote system to use as the root for all API requests.",
-          "type": "string"
-        },
-        "zone": {
-          "description": "The name of the zone when defining an IRODS system.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "auth",
-        "host",
-        "port",
-        "protocol"
-      ]
-    },
-    "StorageSystem": {
-      "allOf": [
-        {},
-        {
-          "$ref": "#/definitions/System"
-        },
-        {
-          "$ref": "#/definitions/SystemRequest"
-        }
-      ]
-    },
-    "StoredCredential": {
-      "properties": {
-        "caCerts": {
-          "description": "A public URL to the location of the trusted CA certs to use with this credential.",
-          "type": "string"
-        },
-        "credential": {
-          "description": "The credential used to authenticate to the remote system. Depending on the authentication protocol of the remote system, this could be an OAuth Token, X.509 certificate, Kerberose token, or an private key..",
-          "type": "string"
-        },
-        "expirationDate": {
-          "description": "The date the credential expires in ISO 8601 format.",
-          "format": "date-time",
-          "type": "string"
-        },
-        "internalUsername": {
-          "description": "The username of the internal user associated with this credential.",
-          "type": "string"
-        },
-        "isDefault": {
-          "description": "Is this the default credential for this internal user of this type on this system?",
-          "type": "boolean"
-        },
-        "parentType": {
-          "description": "The system type this credential is associated with.",
-          "enum": [
-            "STORAGE",
-            "EXECUTION"
-          ],
-          "type": "string"
-        },
-        "password": {
-          "description": "The password on the remote system used to authenticate.",
-          "type": "string"
-        },
-        "privateKey": {
-          "description": "The public ssh key used to authenticate to the remote system..",
-          "type": "string"
-        },
-        "publicKey": {
-          "description": "The public ssh key used to authenticate to the remote system.",
-          "type": "string"
-        },
-        "server": {
-          "$ref": "#/definitions/UserCredentialServer",
-          "description": "The server from which a credential may be obtained."
-        },
-        "type": {
-          "description": "The authentication type.",
-          "enum": [
-            "APIKEYS",
-            "LOCAL",
-            "PAM",
-            "PASSWORD",
-            "SSHKEYS",
-            "TOKEN",
-            "X509",
-            "ANONYMOUS"
-          ],
-          "type": "string"
-        },
-        "username": {
-          "description": "The local username on the remote system used to authenticate.",
-          "type": "string"
-        },
-        "valid": {
-          "description": "Is the credential still valid or has it expired?.",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "type",
-        "username"
-      ]
-    },
-    "System": {
-      "discriminator": "type",
-      "properties": {
-        "description": {
-          "description": "Verbose description of this system.",
-          "type": "string"
-        },
-        "environment": {
-          "description": "Environment variables to set upon login prior to job submission.",
-          "type": "string"
-        },
-        "executionType": {
-          "description": "The execution paradigm used to run jobs on this system.",
-          "enum": [
-            "HPC",
-            "CONDOR",
-            "CLI"
-          ],
-          "type": "string"
-        },
-        "id": {
-          "description": "Unique identifier for this system.",
-          "type": "string"
-        },
-        "isDefault": {
-          "description": "Is the system the default for the authenticated user?",
-          "type": "boolean"
-        },
-        "isPublic": {
-          "description": "Is the system publicly available?",
-          "type": "boolean"
-        },
-        "lastModified": {
-          "description": "The date this system was last modified in ISO 8601 format.",
-          "format": "date-time",
-          "type": "string"
-        },
-        "login": {
-          "$ref": "#/definitions/LoginConfig",
-          "description": "The login config defining how to connect to this system for job submission."
-        },
-        "maxSystemJobs": {
-          "description": "The maximum number of jobs that can be simultaneously run on the system across all queues.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "maxSystemJobsPerUser": {
-          "description": "The maximum number of jobs that can be simultaneously run on the system across all queues by a single user.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "name": {
-          "description": "Common name for this system.",
-          "type": "string"
-        },
-        "queues": {
-          "description": "The execution paradigm used to run jobs on this system.",
-          "items": {
-            "$ref": "#/definitions/BatchQueue"
+          "auth": {
+            "$ref": "#/components/schemas/UserCredential"
           },
-          "type": "array"
-        },
-        "revision": {
-          "description": "The number of times this app has been updated.",
-          "type": "integer"
-        },
-        "scheduler": {
-          "description": "The type of scheduled used to run jobs.",
-          "enum": [
-            "COBALT",
-            "CONDOR",
-            "FORK",
-            "LOADLEVELER",
-            "LSF",
-            "MOAB",
-            "PBS",
-            "SGE",
-            "SLURM",
-            "TORQUE",
-            "UNKNOWN"
-          ],
-          "type": "string"
-        },
-        "scratchDir": {
-          "description": "The scratch directory where job execution directories will be created at runtime. The workDir is used if this is not specified.",
-          "type": "string"
-        },
-        "site": {
-          "description": "The site associated with this system.",
-          "type": "string"
-        },
-        "startupScript": {
-          "description": "Script to be run after login and prior to execution.",
-          "type": "string"
-        },
-        "status": {
-          "description": "The status of this system. Systems must be in UP status to be used.",
-          "enum": [
-            "UP",
-            "DOWN",
-            "UNKNOWN"
-          ],
-          "type": "string"
-        },
-        "storage": {
-          "$ref": "#/definitions/StorageConfig",
-          "description": "The storage config defining how to connect to this system for data staging."
-        },
-        "type": {
-          "description": "The type of this system.",
-          "enum": [
-            "EXECUTION",
-            "STORAGE"
-          ],
-          "type": "string"
-        },
-        "uuid": {
-          "description": "The uuid of this system.",
-          "type": "string"
-        },
-        "workDir": {
-          "description": "The work directory where job execution directories will be created at runtime. This is used if scratchDir is not specified. If neither are specified, the job directory will be created in the system homeDir.",
-          "type": "string"
-        }
-      }
-    },
-    "SystemCredentialsResponse": {
-      "properties": {
-        "message": {
-          "description": "success or failure",
-          "type": "string"
-        },
-        "result": {
-          "$ref": "#/definitions/StoredCredential"
-        },
-        "status": {
-          "description": "success or failure",
-          "type": "string"
-        }
-      }
-    },
-    "SystemOperationRequest": {
-      "properties": {
-        "action": {
-          "description": "Action to perform on the system.",
-          "enum": [
-            "PUBLISH",
-            "UNPUBLISH",
-            "SETDEFAULT",
-            "UNSETDEFAULT",
-            "SETGLOBALDEFAULT",
-            "UNSETGLOBALDEFAULT",
-            "CLONE"
-          ],
-          "type": "string"
-        },
-        "id": {
-          "description": "The new system id of the cloned system",
-          "type": "string"
-        }
-      },
-      "required": [
-        "action"
-      ]
-    },
-    "SystemRequest": {
-      "discriminator": "type",
-      "properties": {
-        "description": {
-          "description": "Verbose description of this system.",
-          "type": "string"
-        },
-        "environment": {
-          "description": "Environment variables to set upon login prior to job submission.",
-          "type": "string"
-        },
-        "executionType": {
-          "description": "The execution paradigm used to run jobs on this system.",
-          "enum": [
-            "HPC",
-            "CONDOR",
-            "CLI"
-          ],
-          "type": "string"
-        },
-        "id": {
-          "description": "Unique identifier for this system.",
-          "type": "string"
-        },
-        "login": {
-          "$ref": "#/definitions/LoginConfig",
-          "description": "The login config defining how to connect to this system for job submission."
-        },
-        "maxSystemJobs": {
-          "description": "The maximum number of jobs that can be simultaneously run on the system across all queues.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "maxSystemJobsPerUser": {
-          "description": "The maximum number of jobs that can be simultaneously run on the system across all queues by a single user.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "name": {
-          "description": "Common name for this system.",
-          "type": "string"
-        },
-        "queues": {
-          "description": "The execution paradigm used to run jobs on this system.",
-          "items": {
-            "$ref": "#/definitions/BatchQueue"
+          "port": {
+            "type": "integer",
+            "description": "The port number of the submission server.",
+            "format": "int32"
           },
-          "type": "array"
-        },
-        "scheduler": {
-          "description": "The type of scheduled used to run jobs.",
-          "enum": [
-            "COBALT",
-            "CONDOR",
-            "FORK",
-            "LOADLEVELER",
-            "LSF",
-            "MOAB",
-            "PBS",
-            "SGE",
-            "SLURM",
-            "TORQUE",
-            "UNKNOWN"
-          ],
-          "type": "string"
-        },
-        "scratchDir": {
-          "description": "The scratch directory where job execution directories will be created at runtime. The workDir is used if this is not specified.",
-          "type": "string"
-        },
-        "site": {
-          "description": "The site associated with this system.",
-          "type": "string"
-        },
-        "startupScript": {
-          "description": "Script to be run after login and prior to execution.",
-          "type": "string"
-        },
-        "status": {
-          "description": "The functional status of this system. Systems must be in UP status to be used.",
-          "enum": [
-            "UP",
-            "DOWN",
-            "UNKNOWN"
-          ],
-          "type": "string"
-        },
-        "storage": {
-          "$ref": "#/definitions/StorageConfig",
-          "description": "The storage config defining how to connect to this system for data staging."
-        },
-        "type": {
-          "description": "The type of this system.",
-          "enum": [
-            "EXECUTION",
-            "STORAGE"
-          ],
-          "type": "string"
-        },
-        "workDir": {
-          "description": "The work directory where job execution directories will be created at runtime. This is used if scratchDir is not specified. If neither are specified, the job directory will be created in the system homeDir.",
-          "type": "string"
+          "protocol": {
+            "type": "string",
+            "description": "The protocol used to authenticate to the submission server.",
+            "enum": [
+              "GSISSH",
+              "SSH",
+              "LOCAL"
+            ]
+          }
         }
       },
-      "required": [
-        "id",
-        "storage",
-        "name",
-        "status",
-        "type"
-      ]
-    },
-    "SystemRole": {
-      "properties": {
-        "role": {
-          "description": "The role granted this user.",
-          "enum": [
-            "GUEST",
-            "USER",
-            "PUBLISHER",
-            "ADMIN",
-            "OWNER"
-          ],
-          "type": "string"
-        },
-        "username": {
-          "description": "The username of the api user granted this role.",
-          "type": "string"
+      "MultipleSystemResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "success or failure"
+          },
+          "result": {
+            "type": "array",
+            "description": "response body",
+            "items": {
+              "$ref": "#/components/schemas/SystemSummary"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "success or failure"
+          }
         }
       },
-      "required": [
-        "role",
-        "username"
-      ]
-    },
-    "SystemSummary": {
-      "properties": {
-        "description": {
-          "description": "Verbose description of this system.",
-          "type": "string"
+      "MultipleSystemRoleResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "success or failure"
+          },
+          "result": {
+            "type": "array",
+            "description": "All matching roles for this system",
+            "items": {
+              "$ref": "#/components/schemas/SystemRole"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "success or failure"
+          }
+        }
+      },
+      "SingleSystemResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "success or failure"
+          },
+          "result": {
+            "$ref": "#/components/schemas/System"
+          },
+          "status": {
+            "type": "string",
+            "description": "success or failure"
+          }
+        }
+      },
+      "StorageConfig": {
+        "required": [
+          "auth",
+          "host",
+          "port",
+          "protocol"
+        ],
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "The hostname or ip address of the storage server"
+          },
+          "auth": {
+            "$ref": "#/components/schemas/UserCredential"
+          },
+          "containerName": {
+            "type": "string",
+            "description": "The name of the bucket to interact with when using an object store."
+          },
+          "homeDir": {
+            "type": "string",
+            "description": "The path on the remote system to use as the home directory for all API requests. For cases where the home directory should be dynamically defined, the ${USERNAME} token can be included in the homeDir value to represent the username of the authenticated user. ex. /home/${USERNAME}."
+          },
+          "mirror": {
+            "type": "boolean",
+            "description": "Whether the permissions set on the server should be pushed to the storage system itself. This only applies to IRODS and AWS systems."
+          },
+          "port": {
+            "type": "integer",
+            "description": "The port number of the storage server.",
+            "format": "int32"
+          },
+          "protocol": {
+            "type": "string",
+            "description": "The protocol used to authenticate to the storage server.",
+            "enum": [
+              "AZURE",
+              "FTP",
+              "GRIDFTP",
+              "IRODS",
+              "LOCAL",
+              "S3",
+              "SFTP",
+              "SWIFT"
+            ]
+          },
+          "publicAppsDir": {
+            "type": "string",
+            "description": "The path on the remote system where apps will be stored if this is set as the default public storage system."
+          },
+          "resource": {
+            "type": "string",
+            "description": "The name of the target resource when defining an IRODS system."
+          },
+          "rootDir": {
+            "type": "string",
+            "description": "The path on the remote system to use as the root for all API requests."
+          },
+          "zone": {
+            "type": "string",
+            "description": "The name of the zone when defining an IRODS system."
+          }
+        }
+      },
+      "StorageSystem": {
+        "allOf": [
+          {
+            "type": "object"
+          },
+          {
+            "$ref": "#/components/schemas/System"
+          },
+          {
+            "$ref": "#/components/schemas/SystemRequest"
+          }
+        ]
+      },
+      "StoredCredential": {
+        "required": [
+          "type",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "caCerts": {
+            "type": "string",
+            "description": "A public URL to the location of the trusted CA certs to use with this credential."
+          },
+          "credential": {
+            "type": "string",
+            "description": "The credential used to authenticate to the remote system. Depending on the authentication protocol of the remote system, this could be an OAuth Token, X.509 certificate, Kerberose token, or an private key.."
+          },
+          "expirationDate": {
+            "type": "string",
+            "description": "The date the credential expires in ISO 8601 format.",
+            "format": "date-time"
+          },
+          "internalUsername": {
+            "type": "string",
+            "description": "The username of the internal user associated with this credential."
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Is this the default credential for this internal user of this type on this system?"
+          },
+          "parentType": {
+            "type": "string",
+            "description": "The system type this credential is associated with.",
+            "enum": [
+              "STORAGE",
+              "EXECUTION"
+            ]
+          },
+          "password": {
+            "type": "string",
+            "description": "The password on the remote system used to authenticate."
+          },
+          "privateKey": {
+            "type": "string",
+            "description": "The public ssh key used to authenticate to the remote system.."
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "The public ssh key used to authenticate to the remote system."
+          },
+          "server": {
+            "$ref": "#/components/schemas/UserCredentialServer"
+          },
+          "type": {
+            "type": "string",
+            "description": "The authentication type.",
+            "enum": [
+              "APIKEYS",
+              "LOCAL",
+              "PAM",
+              "PASSWORD",
+              "SSHKEYS",
+              "TOKEN",
+              "X509",
+              "ANONYMOUS"
+            ]
+          },
+          "username": {
+            "type": "string",
+            "description": "The local username on the remote system used to authenticate."
+          },
+          "valid": {
+            "type": "boolean",
+            "description": "Is the credential still valid or has it expired?."
+          }
+        }
+      },
+      "System": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Verbose description of this system."
+          },
+          "environment": {
+            "type": "string",
+            "description": "Environment variables to set upon login prior to job submission."
+          },
+          "executionType": {
+            "type": "string",
+            "description": "The execution paradigm used to run jobs on this system.",
+            "enum": [
+              "HPC",
+              "CONDOR",
+              "CLI"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this system."
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Is the system the default for the authenticated user?"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Is the system publicly available?"
+          },
+          "lastModified": {
+            "type": "string",
+            "description": "The date this system was last modified in ISO 8601 format.",
+            "format": "date-time"
+          },
+          "login": {
+            "$ref": "#/components/schemas/LoginConfig"
+          },
+          "maxSystemJobs": {
+            "type": "integer",
+            "description": "The maximum number of jobs that can be simultaneously run on the system across all queues.",
+            "format": "int32"
+          },
+          "maxSystemJobsPerUser": {
+            "type": "integer",
+            "description": "The maximum number of jobs that can be simultaneously run on the system across all queues by a single user.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Common name for this system."
+          },
+          "queues": {
+            "type": "array",
+            "description": "The execution paradigm used to run jobs on this system.",
+            "items": {
+              "$ref": "#/components/schemas/BatchQueue"
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "description": "The number of times this app has been updated."
+          },
+          "scheduler": {
+            "type": "string",
+            "description": "The type of scheduled used to run jobs.",
+            "enum": [
+              "COBALT",
+              "CONDOR",
+              "FORK",
+              "LOADLEVELER",
+              "LSF",
+              "MOAB",
+              "PBS",
+              "SGE",
+              "SLURM",
+              "TORQUE",
+              "UNKNOWN"
+            ]
+          },
+          "scratchDir": {
+            "type": "string",
+            "description": "The scratch directory where job execution directories will be created at runtime. The workDir is used if this is not specified."
+          },
+          "site": {
+            "type": "string",
+            "description": "The site associated with this system."
+          },
+          "startupScript": {
+            "type": "string",
+            "description": "Script to be run after login and prior to execution."
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of this system. Systems must be in UP status to be used.",
+            "enum": [
+              "UP",
+              "DOWN",
+              "UNKNOWN"
+            ]
+          },
+          "storage": {
+            "$ref": "#/components/schemas/StorageConfig"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of this system.",
+            "enum": [
+              "EXECUTION",
+              "STORAGE"
+            ]
+          },
+          "uuid": {
+            "type": "string",
+            "description": "The uuid of this system."
+          },
+          "workDir": {
+            "type": "string",
+            "description": "The work directory where job execution directories will be created at runtime. This is used if scratchDir is not specified. If neither are specified, the job directory will be created in the system homeDir."
+          }
         },
-        "id": {
-          "description": "Unique identifier for this system.",
-          "type": "string"
+        "discriminator": {
+          "propertyName": "type"
+        }
+      },
+      "SystemCredentialsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "success or failure"
+          },
+          "result": {
+            "$ref": "#/components/schemas/StoredCredential"
+          },
+          "status": {
+            "type": "string",
+            "description": "success or failure"
+          }
+        }
+      },
+      "SystemOperationRequest": {
+        "required": [
+          "action"
+        ],
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Action to perform on the system.",
+            "enum": [
+              "PUBLISH",
+              "UNPUBLISH",
+              "SETDEFAULT",
+              "UNSETDEFAULT",
+              "SETGLOBALDEFAULT",
+              "UNSETGLOBALDEFAULT",
+              "CLONE"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "The new system id of the cloned system"
+          }
+        }
+      },
+      "SystemRequest": {
+        "required": [
+          "id",
+          "name",
+          "status",
+          "storage",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Verbose description of this system."
+          },
+          "environment": {
+            "type": "string",
+            "description": "Environment variables to set upon login prior to job submission."
+          },
+          "executionType": {
+            "type": "string",
+            "description": "The execution paradigm used to run jobs on this system.",
+            "enum": [
+              "HPC",
+              "CONDOR",
+              "CLI"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this system."
+          },
+          "login": {
+            "$ref": "#/components/schemas/LoginConfig"
+          },
+          "maxSystemJobs": {
+            "type": "integer",
+            "description": "The maximum number of jobs that can be simultaneously run on the system across all queues.",
+            "format": "int32"
+          },
+          "maxSystemJobsPerUser": {
+            "type": "integer",
+            "description": "The maximum number of jobs that can be simultaneously run on the system across all queues by a single user.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Common name for this system."
+          },
+          "queues": {
+            "type": "array",
+            "description": "The execution paradigm used to run jobs on this system.",
+            "items": {
+              "$ref": "#/components/schemas/BatchQueue"
+            }
+          },
+          "scheduler": {
+            "type": "string",
+            "description": "The type of scheduled used to run jobs.",
+            "enum": [
+              "COBALT",
+              "CONDOR",
+              "FORK",
+              "LOADLEVELER",
+              "LSF",
+              "MOAB",
+              "PBS",
+              "SGE",
+              "SLURM",
+              "TORQUE",
+              "UNKNOWN"
+            ]
+          },
+          "scratchDir": {
+            "type": "string",
+            "description": "The scratch directory where job execution directories will be created at runtime. The workDir is used if this is not specified."
+          },
+          "site": {
+            "type": "string",
+            "description": "The site associated with this system."
+          },
+          "startupScript": {
+            "type": "string",
+            "description": "Script to be run after login and prior to execution."
+          },
+          "status": {
+            "type": "string",
+            "description": "The functional status of this system. Systems must be in UP status to be used.",
+            "enum": [
+              "UP",
+              "DOWN",
+              "UNKNOWN"
+            ]
+          },
+          "storage": {
+            "$ref": "#/components/schemas/StorageConfig"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of this system.",
+            "enum": [
+              "EXECUTION",
+              "STORAGE"
+            ]
+          },
+          "workDir": {
+            "type": "string",
+            "description": "The work directory where job execution directories will be created at runtime. This is used if scratchDir is not specified. If neither are specified, the job directory will be created in the system homeDir."
+          }
         },
-        "isDefault": {
-          "description": "Is the system the default for the authenticated user?",
-          "type": "boolean"
-        },
-        "isPublic": {
-          "description": "Is the system publicly available?",
-          "type": "boolean"
-        },
-        "name": {
-          "description": "Common name for this system.",
-          "type": "string"
-        },
-        "status": {
-          "description": "The status of this system. Systems must be in UP status to be used.",
-          "enum": [
-            "UP",
-            "DOWN",
-            "UNKNOWN"
-          ],
-          "type": "string"
-        },
-        "type": {
-          "description": "The type of this system.",
-          "enum": [
-            "EXECUTION",
-            "STORAGE"
-          ],
-          "type": "string"
+        "discriminator": {
+          "propertyName": "type"
+        }
+      },
+      "SystemRole": {
+        "required": [
+          "role",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "The role granted this user.",
+            "enum": [
+              "GUEST",
+              "USER",
+              "PUBLISHER",
+              "ADMIN",
+              "OWNER"
+            ]
+          },
+          "username": {
+            "type": "string",
+            "description": "The username of the api user granted this role."
+          }
+        }
+      },
+      "SystemSummary": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Verbose description of this system."
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this system."
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Is the system the default for the authenticated user?"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Is the system publicly available?"
+          },
+          "name": {
+            "type": "string",
+            "description": "Common name for this system."
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of this system. Systems must be in UP status to be used.",
+            "enum": [
+              "UP",
+              "DOWN",
+              "UNKNOWN"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of this system.",
+            "enum": [
+              "EXECUTION",
+              "STORAGE"
+            ]
+          }
+        }
+      },
+      "UserCredential": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "caCerts": {
+            "type": "string",
+            "description": "A public URL to the location of the trusted CA certs to use with this credential."
+          },
+          "credential": {
+            "type": "string",
+            "description": "The credential used to authenticate to the remote system. Depending on the authentication protocol of the remote system, this could be an OAuth Token, X.509 certificate, Kerberose token, or an private key.."
+          },
+          "internalUsername": {
+            "type": "string",
+            "description": "The username of the internal user associated with this credential."
+          },
+          "password": {
+            "type": "string",
+            "description": "The password on the remote system used to authenticate."
+          },
+          "privateKey": {
+            "type": "string",
+            "description": "The public ssh key used to authenticate to the remote system.."
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "The public ssh key used to authenticate to the remote system."
+          },
+          "server": {
+            "$ref": "#/components/schemas/UserCredentialServer"
+          },
+          "type": {
+            "type": "string",
+            "description": "The authentication type.",
+            "enum": [
+              "APIKEYS",
+              "LOCAL",
+              "PAM",
+              "PASSWORD",
+              "SSHKEYS",
+              "TOKEN",
+              "X509"
+            ]
+          },
+          "username": {
+            "type": "string",
+            "description": "The local username on the remote system used to authenticate."
+          }
+        }
+      },
+      "UserCredentialServer": {
+        "required": [
+          "endpoint",
+          "port",
+          "protocol"
+        ],
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "The hostname or ip address of the remote server."
+          },
+          "port": {
+            "type": "integer",
+            "description": "The port number of the remote server..",
+            "format": "int32"
+          },
+          "protocol": {
+            "type": "string",
+            "description": "The protocol used to obtain a credential from the remote server.",
+            "enum": [
+              "MYPROXY",
+              "MPG"
+            ]
+          }
         }
       }
-    },
-    "UserCredential": {
-      "properties": {
-        "caCerts": {
-          "description": "A public URL to the location of the trusted CA certs to use with this credential.",
-          "type": "string"
-        },
-        "credential": {
-          "description": "The credential used to authenticate to the remote system. Depending on the authentication protocol of the remote system, this could be an OAuth Token, X.509 certificate, Kerberose token, or an private key..",
-          "type": "string"
-        },
-        "internalUsername": {
-          "description": "The username of the internal user associated with this credential.",
-          "type": "string"
-        },
-        "password": {
-          "description": "The password on the remote system used to authenticate.",
-          "type": "string"
-        },
-        "privateKey": {
-          "description": "The public ssh key used to authenticate to the remote system..",
-          "type": "string"
-        },
-        "publicKey": {
-          "description": "The public ssh key used to authenticate to the remote system.",
-          "type": "string"
-        },
-        "server": {
-          "$ref": "#/definitions/UserCredentialServer",
-          "description": "The server from which a credential may be obtained."
-        },
-        "type": {
-          "description": "The authentication type.",
-          "enum": [
-            "APIKEYS",
-            "LOCAL",
-            "PAM",
-            "PASSWORD",
-            "SSHKEYS",
-            "TOKEN",
-            "X509"
-          ],
-          "type": "string"
-        },
-        "username": {
-          "description": "The local username on the remote system used to authenticate.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "type"
-      ]
-    },
-    "UserCredentialServer": {
-      "properties": {
-        "endpoint": {
-          "description": "The hostname or ip address of the remote server.",
-          "type": "string"
-        },
-        "port": {
-          "description": "The port number of the remote server..",
-          "format": "int32",
-          "type": "integer"
-        },
-        "protocol": {
-          "description": "The protocol used to obtain a credential from the remote server.",
-          "enum": [
-            "MYPROXY",
-            "MPG"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "endpoint",
-        "port",
-        "protocol"
-      ]
     }
   }
 }
