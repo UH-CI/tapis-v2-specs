@@ -2,11 +2,11 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Tapis v2 Systems API",
-    "version": "${project.version}-r${buildNumber}"
+    "version": "version1"
   },
   "servers": [
     {
-      "url": "/$%7Bfoundation.base.url%7D"
+      "url": "https://agaveauth.its.hawaii.edu/"
     }
   ],
   "paths": {
