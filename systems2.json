@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Tapis v2 Systems API",
-    "version": "version1"
+    "version": 1.0.0
   },
   "servers": [
     {
