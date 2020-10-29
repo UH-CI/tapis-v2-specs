@@ -12,6 +12,7 @@
   "paths": {
     "/systems/v2/": {
       "get": {
+        "tags":["System"],
         "summary": "List and/or search for systems available to you.",
         "description": "All systems you own, public systems, and systems that have been shared with you.",
         "operationId": "list",
@@ -67,6 +68,7 @@
         }
       },
       "post": {
+        "tags":["System"],
         "summary": "Add or update a system.",
         "operationId": "add",
         "requestBody": {
@@ -97,6 +99,7 @@
     },
     "/systems/v2/{systemId}": {
       "get": {
+        "tags":["System"],
         "summary": "Get individual system details.",
         "operationId": "get",
         "parameters": [
@@ -124,6 +127,7 @@
         }
       },
       "put": {
+        "tags":["System"],
         "summary": "Perform a management action on the system.",
         "description": "PUBLISH moves the system from private to public. Only API administrators can peform this action. DEFAULT makes the given system your default system of that type. When no system is explicitly specified in URI, your default storage system will be used. CLONE creates a private copy of the named system. Authentication information will not be cloned, so you must update the system with your own credentials.",
         "operationId": "manage",
@@ -164,6 +168,7 @@
         "x-codegen-request-body-name": "body"
       },
       "post": {
+        "tags":["System"],
         "summary": "Update a system description.",
         "operationId": "update",
         "parameters": [
@@ -203,6 +208,7 @@
         "x-codegen-request-body-name": "body"
       },
       "delete": {
+        "tags":["System"],
         "summary": "Delete a system.",
         "description": "Disables the system and all applications registered to it. Once deleted, the system cannot be recovered and the systemId cannot be reused.",
         "operationId": "delete",
@@ -233,6 +239,7 @@
     },
     "/systems/v2/{systemId}/credentials": {
       "get": {
+        "tags":["System"],
         "summary": "Get a list of all internal users and their credentials on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "listCredentials",
@@ -261,6 +268,7 @@
         }
       },
       "post": {
+        "tags":["System"],
         "summary": "Add or update a user's credential on a system. This applies both to data and, if applicable, login credenitals.",
         "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "updateCredentials",
@@ -301,6 +309,7 @@
         "x-codegen-request-body-name": "body"
       },
       "delete": {
+        "tags":["System"],
         "summary": "Deletes all credentials registered to a system.",
         "description": "This will delete all credentials except the default system credential. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
         "operationId": "deleteCredentials",
@@ -331,6 +340,7 @@
     },
     "/systems/v2/{systemId}/credentials/{internalUsername}": {
       "get": {
+        "tags":["System"],
         "summary": "Get a list of all internal users and their credentials on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "listCredentialsForInternalUser",
@@ -368,6 +378,7 @@
         }
       },
       "post": {
+        "tags":["System"],
         "summary": "Add or update a user's credentials on a system.",
         "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. The internalUsername value in the POST JSON must match the URI username value or an error message will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "updateCredentialsForInternalUser",
@@ -417,6 +428,7 @@
         "x-codegen-request-body-name": "body"
       },
       "delete": {
+        "tags":["System"],
         "summary": "Deletes all credentials registered to a system.",
         "description": "This will delete all internal user credentials on this system. The internal users will remain unchanged and their individual credentials will fall back to the default system credential on all future interactions. Users must have ADMIN role or greater on a system to delete its roles. No sensitive information will be returned.",
         "operationId": "deleteCredentialsForInternalUser",
@@ -456,6 +468,7 @@
     },
     "/systems/v2/{systemId}/credentials/{internalUsername}/{credentialType}": {
       "get": {
+        "tags":["System"],
         "summary": "Get the internal user credential of the given type on the system.",
         "description": "If the internal user has no personal credential registered, the system default credential of the specified type will be returned. Users must have ADMIN role or greater on a system to view its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "listCredentialsForInternalUserByType",
@@ -506,6 +519,7 @@
         }
       },
       "post": {
+        "tags":["System"],
         "summary": "Add or update a credential of the given type on a system.",
         "description": "Credentials will be valided when submitted. If the credentials are not valid, an error will be returned. The internalUsername value in the POST JSON must match the URI username value or an error message will be returned. Users must have ADMIN role or greater on a system to manage its credentials. No sensitive information will be returned. This is strictly to keep track of which internal users have their own credentials.",
         "operationId": "updateCredentialsForInternalUserByType",
@@ -620,6 +634,7 @@
     },
     "/systems/v2/{systemId}/roles": {
       "get": {
+        "tags":["System"],
         "summary": "Get a list of all users and their roles on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its roles.",
         "operationId": "listRoles",
@@ -648,6 +663,7 @@
         }
       },
       "post": {
+        "tags":["System"],
         "summary": "Add or update a user's role on a system.",
         "description": "Setting a user's role to NONE or an empty string is the same as deleting that user's permission. Once all user's roles have been removed from a system, any applications that were registered by the user on the system will be disabled. Users must have ADMIN role or greater on a system to manage its roles.",
         "operationId": "updateRole",
@@ -688,6 +704,7 @@
         "x-codegen-request-body-name": "body"
       },
       "delete": {
+        "tags":["System"],
         "summary": "Deletes all roles on a system.",
         "description": "This will reset the permissions such that only the user who registered the system will be able to view it. System owners cannot remove their own permissions. All apps registered by the deleted users on this system will be disabled. Users must have ADMIN role or greater on a system to delete its roles.",
         "operationId": "deleteRoles",
@@ -718,6 +735,7 @@
     },
     "/systems/v2/{systemId}/roles/{username}": {
       "get": {
+        "tags":["System"],
         "summary": "Get a specific user's roles on this system.",
         "description": "Users must have ADMIN role or greater on a system to view its roles.",
         "operationId": "listRolesForUser",
@@ -755,6 +773,7 @@
         }
       },
       "post": {
+        "tags":["System"],
         "summary": "Add or update a user's role on a system.",
         "description": "Setting a user's role to NONE or an empty string is the same as deleting that user's permission. Once all user's roles have been removed from a system, any applications that were registered by the user on the system will be disabled. Users must have ADMIN role or greater on a system to edit its roles.",
         "operationId": "updateRoleForUser",
@@ -804,6 +823,7 @@
         "x-codegen-request-body-name": "body"
       },
       "delete": {
+        "tags":["System"],
         "summary": "Deletes all roles on a system.",
         "description": "This will reset the permissions such that only the user who registered the system will be able to view it. System owners cannot remove their own permissions. All apps registered by the deleted users on this system will be disabled. Users must have ADMIN role or greater on a system to delete its roles.",
         "operationId": "deleteRoleForUser",
